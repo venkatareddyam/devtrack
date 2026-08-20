@@ -1,0 +1,23 @@
+{
+  "name": "devtrack",
+  "version": "1.0.0",
+  "description": "Developer task tracking REST API",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --runInBand",
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [],
+  "author": "Venkata Subbareddy",
+  "license": "MIT",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "supertest": "^7.2.2"
+  }
+}
