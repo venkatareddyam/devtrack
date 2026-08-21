@@ -9,18 +9,20 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm ci'
-            }
+       stage('Install Dependencies') {
+    steps {
+        withEnv(["PATH+NODE=${env.NODE_HOME}"]) {
+            sh 'npm ci'
         }
-
-        stage('Run Tests') {
-            steps {
-                sh 'npm test'
-            }
+    }
+}
+      stage('Run Tests') {
+    steps {
+        withEnv(["PATH+NODE=${env.NODE_HOME}"]) {
+            sh 'npm test'
         }
-
+    }
+}
         stage('Build Docker Image') {
             steps {
                 withEnv(["PATH+DOCKER=${env.DOCKER_HOME}"]) {
