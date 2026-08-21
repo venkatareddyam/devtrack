@@ -22,12 +22,14 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-        steps {
-        withEnv(["PATH+DOCKER=${env.DOCKER_HOME}"]) {
-            sh 'docker build -t devtrack:${BUILD_NUMBER} .'
+            steps {
+                withEnv(["PATH+DOCKER=${env.DOCKER_HOME}"]) {
+                    sh 'docker build -t devtrack:${BUILD_NUMBER} .'
+                }
+            }
         }
     }
-}
+
     post {
         success {
             echo 'DevTrack CI pipeline completed successfully.'
