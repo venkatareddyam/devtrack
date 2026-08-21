@@ -1,0 +1,11 @@
+node_modules/
+coverage/
+.git/
+.github/
+.env
+.env.*
+.scannerwork/
+*.log
+.vscode/
+.idea/
+README.md
