@@ -9,6 +9,18 @@ pipeline {
             }
         }
 
+        stage('Check Kubernetes') {
+            steps {
+                sh '''
+                    kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
+                        config current-context
+
+                    kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
+                        get nodes
+                '''
+            }
+        }
+
         stage('Install Dependencies') {
             steps {
                 withEnv(["PATH+NODE=${env.NODE_HOME}"]) {
@@ -56,21 +68,22 @@ pipeline {
             }
         }
 
-stage('Deploy to Kubernetes') {
-    steps {
-        sh '''
-            kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
-                apply -f k8s/deployment.yaml
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                    kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
+                        apply -f k8s/deployment.yaml
 
-            kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
-                set image deployment/devtrack \
-                devtrack=devtrack:${BUILD_NUMBER}
+                    kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
+                        set image deployment/devtrack \
+                        devtrack=devtrack:${BUILD_NUMBER}
 
-            kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
-                rollout status deployment/devtrack
-        '''
+                    kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
+                        rollout status deployment/devtrack
+                '''
+            }
+        }
     }
-}
 
     post {
         success {
