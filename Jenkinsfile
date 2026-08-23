@@ -23,6 +23,15 @@ pipeline {
         }
     }
 }
+ stage('SonarQube Analysis') {
+    steps {
+        withSonarQubeEnv('SonarQube') {
+            withEnv(["PATH+NODE=${env.NODE_HOME}"]) {
+                sh 'npx sonar-scanner'
+            }
+        }
+    }
+}
         stage('Build Docker Image') {
             steps {
                 withEnv(["PATH+DOCKER=${env.DOCKER_HOME}"]) {
