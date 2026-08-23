@@ -51,18 +51,16 @@ pipeline {
             }
         }
 
-        stage('Deploy Docker Container') {
+        stage('Deploy to Kubernetes') {
             steps {
-                withEnv(["PATH+DOCKER=${env.DOCKER_HOME}"]) {
-                    sh '''
-                        docker stop devtrack-api || true
-                        docker rm devtrack-api || true
-                        docker run -d \
-                            --name devtrack-api \
-                            -p 3000:3000 \
-                            devtrack:${BUILD_NUMBER}
-                    '''
-                }
+                sh '''
+                    kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
+                        set image deployment/devtrack \
+                        devtrack=devtrack:${BUILD_NUMBER}
+
+                    kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
+                        rollout status deployment/devtrack
+                '''
             }
         }
     }
