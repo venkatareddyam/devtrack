@@ -42,28 +42,28 @@ pipeline {
                 }
             }
         }
-
-        stage('Build Docker Image') {
-            steps {
-                withEnv(["PATH+DOCKER=${env.DOCKER_HOME}"]) {
-                    sh 'docker build -t devtrack:${BUILD_NUMBER} .'
-                }
-            }
-        }
-
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh '''
-                    kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
-                        set image deployment/devtrack \
-                        devtrack=devtrack:${BUILD_NUMBER}
-
-                    kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
-                        rollout status deployment/devtrack
-                '''
-            }
-        }
+stage('Build Docker Image') {
+    steps {
+        sh '''
+            eval $(minikube -p minikube docker-env)
+            docker build -t devtrack:${BUILD_NUMBER} .
+            docker images devtrack
+        '''
     }
+}
+
+stage('Deploy to Kubernetes') {
+    steps {
+        sh '''
+            kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
+                set image deployment/devtrack \
+                devtrack=devtrack:${BUILD_NUMBER}
+
+            kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
+                rollout status deployment/devtrack
+        '''
+    }
+}
 
     post {
         success {
