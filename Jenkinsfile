@@ -30,11 +30,16 @@ stage('SonarQube Analysis') {
                 "PATH+NODE=${env.NODE_HOME}",
                 "PATH+WINDOWS=C:\\Windows\\System32"
             ]) {
-                sh 'npx sonar-scanner'
+                script {
+                    def jdkHome = tool name: 'JDK21', type: 'hudson.model.JDK'
+                    withEnv(["JAVA_HOME=${jdkHome}", "PATH+JAVA=${jdkHome}\\bin"]) {
+                        sh 'java -version && npx sonar-scanner'
+                    }
+                }
             }
         }
     }
-}    
+} 
  stage('Build Docker Image') {
             steps {
                 withEnv(["PATH+DOCKER=${env.DOCKER_HOME}"]) {
