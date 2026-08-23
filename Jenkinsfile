@@ -34,7 +34,10 @@ pipeline {
                     ]) {
                         script {
                             def jdkHome = tool name: 'JDK21', type: 'hudson.model.JDK'
-                            withEnv(["JAVA_HOME=${jdkHome}", "PATH+JAVA=${jdkHome}\\bin"]) {
+                            withEnv([
+                                "JAVA_HOME=${jdkHome}",
+                                "PATH+JAVA=${jdkHome}\\bin"
+                            ]) {
                                 sh 'java -version && npx sonar-scanner'
                             }
                         }
@@ -42,28 +45,30 @@ pipeline {
                 }
             }
         }
-stage('Build Docker Image') {
-    steps {
-        sh '''
-            eval $(minikube -p minikube docker-env)
-            docker build -t devtrack:${BUILD_NUMBER} .
-            docker images devtrack
-        '''
-    }
-}
 
-stage('Deploy to Kubernetes') {
-    steps {
-        sh '''
-            kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
-                set image deployment/devtrack \
-                devtrack=devtrack:${BUILD_NUMBER}
+        stage('Build Docker Image') {
+            steps {
+                sh '''
+                    eval $(minikube -p minikube docker-env)
+                    docker build -t devtrack:${BUILD_NUMBER} .
+                    docker images devtrack
+                '''
+            }
+        }
 
-            kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
-                rollout status deployment/devtrack
-        '''
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                    kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
+                        set image deployment/devtrack \
+                        devtrack=devtrack:${BUILD_NUMBER}
+
+                    kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
+                        rollout status deployment/devtrack
+                '''
+            }
+        }
     }
-}
 
     post {
         success {
