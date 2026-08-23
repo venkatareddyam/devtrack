@@ -23,16 +23,19 @@ pipeline {
         }
     }
 }
- stage('SonarQube Analysis') {
+stage('SonarQube Analysis') {
     steps {
         withSonarQubeEnv('SonarQube') {
-            withEnv(["PATH+NODE=${env.NODE_HOME}"]) {
+            withEnv([
+                "PATH+NODE=${env.NODE_HOME}",
+                "PATH+WINDOWS=C:\\Windows\\System32"
+            ]) {
                 sh 'npx sonar-scanner'
             }
         }
     }
-}
-        stage('Build Docker Image') {
+}    
+ stage('Build Docker Image') {
             steps {
                 withEnv(["PATH+DOCKER=${env.DOCKER_HOME}"]) {
                     sh 'docker build -t devtrack:${BUILD_NUMBER} .'
