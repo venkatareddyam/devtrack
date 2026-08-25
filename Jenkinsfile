@@ -60,7 +60,10 @@ pipeline {
 
       stage('Build Docker Image') {
     steps {
-        withEnv(["PATH+WINDOWS=C:\\Windows\\System32"]) {
+        withEnv([
+            "PATH+WINDOWS=C:\\Windows\\System32",
+            "PATH+MINIKUBE=C:\\Program Files\\Kubernetes\\Minikube"
+        ]) {
             sh '''
                 echo "Building Docker image devtrack:${BUILD_NUMBER}"
                 docker build -t devtrack:${BUILD_NUMBER} .
@@ -73,8 +76,7 @@ pipeline {
             '''
         }
     }
-}
-        stage('Deploy to Kubernetes') {
+}  stage('Deploy to Kubernetes') {
             steps {
                 sh '''
                     kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
