@@ -60,10 +60,12 @@ pipeline {
 
       stage('Build Docker Image') {
     steps {
-        sh '''
-            minikube image build -t devtrack:${BUILD_NUMBER} .
-            minikube image ls | grep devtrack
-        '''
+        withEnv(["PATH+MINIKUBE=C:\\Program Files\\Kubernetes\\Minikube"]) {
+            sh '''
+                minikube image build -t devtrack:${BUILD_NUMBER} .
+                minikube image ls | grep devtrack
+            '''
+        }
     }
 }
         stage('Deploy to Kubernetes') {
