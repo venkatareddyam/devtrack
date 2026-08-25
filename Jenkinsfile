@@ -46,6 +46,7 @@ pipeline {
                     ]) {
                         script {
                             def jdkHome = tool name: 'JDK21', type: 'hudson.model.JDK'
+
                             withEnv([
                                 "JAVA_HOME=${jdkHome}",
                                 "PATH+JAVA=${jdkHome}\\bin"
@@ -58,25 +59,30 @@ pipeline {
             }
         }
 
-      stage('Build Docker Image') {
-    steps {
-        withEnv([
-            "PATH+WINDOWS=C:\\Windows\\System32",
-            "PATH+MINIKUBE=C:\\Program Files\\Kubernetes\\Minikube"
-        ]) {
-            sh '''
-                echo "Building Docker image devtrack:${BUILD_NUMBER}"
-                docker build -t devtrack:${BUILD_NUMBER} .
+        stage('Build Docker Image') {
+            steps {
+                withEnv([
+                    "PATH+WINDOWS=C:\\Windows\\System32",
+                    "PATH+MINIKUBE=C:\\Program Files\\Kubernetes\\Minikube"
+                ]) {
+                    sh '''
+                        echo "Building Docker image devtrack:${BUILD_NUMBER}"
 
-                echo "Loading image into Minikube"
-                minikube image load devtrack:${BUILD_NUMBER}
+                        docker build -t devtrack:${BUILD_NUMBER} .
 
-                echo "Verifying image in Minikube"
-                minikube image ls | grep devtrack
-            '''
+                        echo "Loading image into Minikube"
+
+                        minikube image load devtrack:${BUILD_NUMBER}
+
+                        echo "Verifying image in Minikube"
+
+                        minikube image ls | grep devtrack
+                    '''
+                }
+            }
         }
-    }
-}  stage('Deploy to Kubernetes') {
+
+        stage('Deploy to Kubernetes') {
             steps {
                 sh '''
                     kubectl --kubeconfig=/c/Users/Lenovo/.kube/config \
