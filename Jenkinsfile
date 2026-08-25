@@ -58,16 +58,14 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                sh '''
-                    eval $(minikube -p minikube docker-env)
-                    docker build -t devtrack:${BUILD_NUMBER} .
-                    docker images devtrack
-                '''
-            }
-        }
-
+      stage('Build Docker Image') {
+    steps {
+        sh '''
+            minikube image build -t devtrack:${BUILD_NUMBER} .
+            minikube image ls | grep devtrack
+        '''
+    }
+}
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
