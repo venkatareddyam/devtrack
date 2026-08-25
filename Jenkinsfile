@@ -60,32 +60,32 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            steps {
-                withEnv([
-    "PATH+WINDOWS=C:\\Windows\\System32",
-    "PATH+MINIKUBE=C:\\Program Files\\Kubernetes\\Minikube",
-    "MINIKUBE_HOME=C:\\Users\\Lenovo\\.minikube",
-    "KUBECONFIG=C:\\Users\\Lenovo\\.kube\\config"
-]) {
-                    sh '''
-                         echo "Checking Minikube"
-                         minikube -p minikube status
+    steps {
+        withEnv([
+            "PATH+WINDOWS=C:\\Windows\\System32",
+            "PATH+MINIKUBE=C:\\Program Files\\Kubernetes\\Minikube",
+            "MINIKUBE_HOME=C:\\Users\\Lenovo\\.minikube",
+            "KUBECONFIG=C:\\Users\\Lenovo\\.kube\\config"
+        ]) {
+            sh '''
+                echo "Checking Minikube"
+                minikube -p minikube status
 
-                        echo "Building Docker image devtrack:${BUILD_NUMBER}"
+                echo "Configuring Docker to use Minikube"
 
-                        docker build -t devtrack:${BUILD_NUMBER} .
+                eval $(minikube -p minikube docker-env)
 
-                        echo "Loading image into Minikube"
+                echo "Building Docker image devtrack:${BUILD_NUMBER}"
 
-                        minikube image load devtrack:${BUILD_NUMBER}
+                docker build -t devtrack:${BUILD_NUMBER} .
 
-                        echo "Verifying image in Minikube"
+                echo "Verifying image"
 
-                        minikube image ls | grep devtrack
-                    '''
-                }
-            }
+                docker images | grep devtrack
+            '''
         }
+    }
+}
 
         stage('Deploy to Kubernetes') {
             steps {
